@@ -25,7 +25,7 @@ class BasicEnv(gym.Env):
 
     def __init__(self):
         self.action_space = spaces.Discrete(81000)
-        self.observation_space = spaces.Discrete(10000)
+        self.observation_space = spaces.Discrete(100000)
 
     def step(self, action):
         # if we took an action, we were in state 1

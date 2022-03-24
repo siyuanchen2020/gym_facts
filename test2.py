@@ -65,16 +65,61 @@ env = gym.make("gym_basic:basic-v0")
 env = Monitor(env, log_dir)
 
 # generate the model by DQN
-model = DQN("MlpPolicy", env, verbose=1)
+model = DQN("MlpPolicy", env, verbose=1,tensorboard_log=log_dir)
 
 #callback
 callback = SaveOnBestTrainingRewardCallback(check_freq=100, log_dir=log_dir)
 
-model.learn(total_timesteps=1000, callback = callback)
+timesteps = 10000
+model.learn(total_timesteps=timesteps, callback = callback)
 # save the model
 model.save("dqn_facts")
 
 #plot the result
-timesteps = 1000
 plot_results([log_dir], timesteps, results_plotter.X_TIMESTEPS, "gym_basic:basic-v0")
 plt.show()
+
+
+# plot a smoother figure
+def moving_average(values, window):
+    """
+    Smooth values by doing a moving average
+    :param values: (numpy array)
+    :param window: (int)
+    :return: (numpy array)
+    """
+    weights = np.repeat(1.0, window) / window
+    return np.convolve(values, weights, 'valid')
+
+
+def plot_results(log_folder, title='Learning Curve'):
+    """
+    plot the results
+    :param log_folder: (str) the save location of the results to plot
+    :param title: (str) the title of the task to plot
+    """
+    x, y = ts2xy(load_results(log_folder), 'timesteps')
+    y = moving_average(y, window=50)
+    # Truncate x
+    x = x[len(x) - len(y):]
+
+    fig = plt.figure(title)
+    plt.plot(x, y)
+    plt.xlabel('Number of Timesteps')
+    plt.ylabel('Rewards')
+    plt.title(title + " Smoothed")
+    plt.show()
+
+plot_results(log_dir)
+
+
+#predict
+obs = env.reset()
+
+#check how the model runs
+for i in range(100):
+    action, _states = model.predict(obs, deterministic=True)
+    obs, reward, done, info = env.step(action)
+    env.render()
+    if done :
+      obs = env.reset()
