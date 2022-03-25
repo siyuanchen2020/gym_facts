@@ -112,26 +112,23 @@ class BasicEnv(gym.Env):
             # standardize the reward
             reward = (reward - 300000) / 300000
         '''
-        for i in range(1,81001):
-            if action == i:
-                input_var = dic[i]
-                numpy.savetxt('input.txt', input_var)
 
-                os.system("xsim-runner.exe --model LawMcComasMOPs.xml --input input.txt --output_txt output_Law.txt")
 
-                with open('output_Law.txt') as my_file:
-                    # Throughput, Work-In-Process, Parts-Produced, and Lead-Time
-                    output_array = my_file.readlines()
-                # get the parts produced
-                parts_produced = float(output_array[2])
-                reward = (200 * parts_produced) - 25000 * (
-                        input_var[0] + input_var[1] + input_var[2] + input_var[3]) - 1000 * (
-                             input_var[4] + input_var[5] + input_var[6])
-                print(input_var)
-                # standardize the reward
-                reward = (reward - 250000) / 250000
+        input_var = dic[action]
+        numpy.savetxt('input.txt', input_var)
 
-        state = 1
+        os.system("xsim-runner.exe --model LawMcComasMOPs.xml --input input.txt --output_txt output_Law.txt")
+
+        with open('output_Law.txt') as my_file:
+            # Throughput, Work-In-Process, Parts-Produced, and Lead-Time
+            output_array = my_file.readlines()
+        # get the parts produced
+        parts_produced = float(output_array[2])
+        reward = (200 * parts_produced) - 25000 * (
+                input_var[0] + input_var[1] + input_var[2] + input_var[3]) - 1000 * (
+                         input_var[4] + input_var[5] + input_var[6])
+        print(input_var)
+
         # regardless of the action, game is done after a single step
         done = True
 

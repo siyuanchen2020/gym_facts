@@ -65,12 +65,12 @@ env = gym.make("gym_basic:basic-v0")
 env = Monitor(env, log_dir)
 
 # generate the model by DQN
-model = DQN("MlpPolicy", env, verbose=1,tensorboard_log=log_dir)
+model = DQN("MlpPolicy", env, verbose=1,tensorboard_log=log_dir,learning_rate= 0.0002, learning_starts=5000)
 
 #callback
 callback = SaveOnBestTrainingRewardCallback(check_freq=100, log_dir=log_dir)
 
-timesteps = 10000
+timesteps = 1000
 model.learn(total_timesteps=timesteps, callback = callback)
 # save the model
 model.save("dqn_facts")
@@ -92,7 +92,7 @@ def moving_average(values, window):
     return np.convolve(values, weights, 'valid')
 
 
-def plot_results(log_folder, title='Learning Curve'):
+def plot_results_smooothed(log_folder, title='Learning Curve'):
     """
     plot the results
     :param log_folder: (str) the save location of the results to plot
@@ -110,7 +110,7 @@ def plot_results(log_folder, title='Learning Curve'):
     plt.title(title + " Smoothed")
     plt.show()
 
-plot_results(log_dir)
+plot_results_smooothed(log_dir)
 
 
 #predict
